@@ -14,7 +14,7 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             print(entry)
 
             # create entry for restaurant
-            restaurant = Restauant.objects.create(
+            restaurant = Restaurant.objects.create(
                 name=entry['Business Name'],
                 status=status_map[entry['Status']],
                 website_url=entry['Website'],
