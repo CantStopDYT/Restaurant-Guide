@@ -35,7 +35,7 @@ class Location(models.Model):
     zipcode = models.CharField(max_length=10, blank=True)
     phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Phone number must be entered in the format: '9371234567'. Up to 15 digits allowed.")
     phone_number = models.CharField(max_length=17, validators=[phone_regex], blank=True)
-    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='locations')
 
     def __str__(self):
         return self.restaurant.name
@@ -54,7 +54,7 @@ class OpeningHours(models.Model):
     weekday = models.IntegerField(choices=Weekday.choices)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
-    address = models.ForeignKey('Location', on_delete=models.CASCADE)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='hours')
 
     class Meta:
         ordering = ('weekday', 'from_hour')
@@ -73,10 +73,11 @@ class OrderMethods(models.Model):
         WEBSITE = 'W', _('Website')
         OTHER = 'O', _('Other')
     order_methods = models.CharField(max_length=1, choices=OrderMethods.choices, blank=True)
-    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='order_methods')
 
     def __str__(self):
         return '{} for {}'.format(self.OrderMethods(self.order_methods).label, self.restaurant)
+
 
 class DeliveryOptions(models.Model):
 
@@ -89,7 +90,7 @@ class DeliveryOptions(models.Model):
         SEAMLESS = 'SL', _('Seamless')
         OTHER = 'OT', _('Other')
     delivery_options = models.CharField(max_length=2, choices=DeliveryMethods.choices, blank=True)
-    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='delivery_options')
 
     def __str__(self):
         return '{} for {}'.format(self.DeliveryMethods(self.delivery_options).label, self.restaurant)
@@ -101,7 +102,7 @@ class PickupOptions(models.Model):
         CARRY_OUT = 'CO', _('Carry Out')
         CURBSIDE = 'CS', _('Curbside')
     pickup_options = models.CharField(max_length=2, choices=PickupOptions.choices, blank=True)
-    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='pickup_options')
 
 
 class DietaryOptions(models.Model):
@@ -115,7 +116,7 @@ class DietaryOptions(models.Model):
         SEAMLESS = 'GF', _('Gluten Free')
         OTHER = 'OT', _('Other')
     dietary_options = models.CharField(max_length=2, choices=DietaryOptions.choices, blank=True)
-    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='dietary_options')
 
     def __str__(self):
         return '{} for {}'.format(self.DietaryOptions(self.dietary_options).label, self.restaurant)
