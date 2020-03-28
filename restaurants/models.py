@@ -75,6 +75,8 @@ class OrderMethods(models.Model):
     order_methods = models.CharField(max_length=1, choices=OrderMethods.choices, blank=True)
     restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '{} for {}'.format(self.OrderMethods(self.order_methods).label, self.restaurant)
 
 class DeliveryOptions(models.Model):
 
@@ -88,6 +90,9 @@ class DeliveryOptions(models.Model):
         OTHER = 'OT', _('Other')
     delivery_options = models.CharField(max_length=2, choices=DeliveryMethods.choices, blank=True)
     restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} for {}'.format(self.DeliveryMethods(self.delivery_options).label, self.restaurant)
 
 
 class PickupOptions(models.Model):
@@ -111,3 +116,6 @@ class DietaryOptions(models.Model):
         OTHER = 'OT', _('Other')
     dietary_options = models.CharField(max_length=2, choices=DietaryOptions.choices, blank=True)
     restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} for {}'.format(self.DietaryOptions(self.dietary_options).label, self.restaurant)
