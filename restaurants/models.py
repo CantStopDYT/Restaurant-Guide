@@ -3,9 +3,9 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 
 
-class Restauant(models.Model):
+class Restaurant(models.Model):
     create = models.DateTimeField(auto_now_add=True)
-    #region = models.CharField(max_length=128, blank=True)
+    # region = models.CharField(max_length=128, blank=True)
 
     # status
     name = models.CharField(max_length=128)
@@ -30,20 +30,23 @@ class Location(models.Model):
     street_address = models.CharField(max_length=128, blank=True)
     city = models.CharField(max_length=32, blank=True)
     zipcode = models.PositiveSmallIntegerField(blank=True)
-    phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Phone number must be entered in the format: '9371234567'. Up to 15 digits allowed.")
-    phone_number = models.CharField(max_length=17, validators=[phone_regex], blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    phone_regex = RegexValidator(regex=r'^\d{9,15}$',
+                                 message="Phone number must be entered in the format: "
+                                         "'9371234567'. Up to 15 digits allowed.")
+    phone_number = models.CharField(max_length=17, validators=[
+                                    phone_regex], blank=True)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class OpeningHours(models.Model):
     WEEKDAYS = [
-      (1, _("Monday")),
-      (2, _("Tuesday")),
-      (3, _("Wednesday")),
-      (4, _("Thursday")),
-      (5, _("Friday")),
-      (6, _("Saturday")),
-      (7, _("Sunday")),
+        (1, _("Monday")),
+        (2, _("Tuesday")),
+        (3, _("Wednesday")),
+        (4, _("Thursday")),
+        (5, _("Friday")),
+        (6, _("Saturday")),
+        (7, _("Sunday")),
     ]
     weekday = models.IntegerField(choices=WEEKDAYS)
     from_hour = models.TimeField()
@@ -66,8 +69,9 @@ class OrderMethods(models.Model):
         ('W', _('Website')),
         ('O', _('Other')),
     ]
-    order_methods = models.CharField(max_length=1, choices=ORDER_METHODS, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    order_methods = models.CharField(
+        max_length=1, choices=ORDER_METHODS, blank=True)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class DeliveryOptions(models.Model):
@@ -81,8 +85,9 @@ class DeliveryOptions(models.Model):
         ('OT', _('Other')),
     ]
     None
-    delivery_options = models.CharField(max_length=2, choices=DELIVERY_OPTIONS, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    delivery_options = models.CharField(
+        max_length=2, choices=DELIVERY_OPTIONS, blank=True)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class PickupOptions(models.Model):
@@ -90,8 +95,9 @@ class PickupOptions(models.Model):
         ('CO', _('Carry Out')),
         ('CS', _('Curbside')),
     ]
-    pickup_options = models.CharField(max_length=2, choices=PICKUP_OPTIONS, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    pickup_options = models.CharField(
+        max_length=2, choices=PICKUP_OPTIONS, blank=True)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class DietaryOptions(models.Model):
@@ -104,5 +110,6 @@ class DietaryOptions(models.Model):
         ('GF', ('Gluten Free')),
         ('OT', ('Other')),
     ]
-    dietary_options = models.CharField(max_length=2, choices=DIET_OPTIONS, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    dietary_options = models.CharField(
+        max_length=2, choices=DIET_OPTIONS, blank=True)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
