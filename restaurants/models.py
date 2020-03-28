@@ -4,48 +4,49 @@ from django.core.validators import RegexValidator
 
 
 class Restauant(models.Model):
-    create = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
     #region = models.CharField(max_length=128, blank=True)
 
     # status
     name = models.CharField(max_length=128)
-    STATUS_OPTIONS = [
-        ('O', _('Regular Hours')),
-        ('L', _('Limited Hours')),
-        ('C', _('Temporarily Closed')),
-    ]
-    status = models.CharField(max_length=1, choices=STATUS_OPTIONS)
+
+    class StatusOptions(models.TextChoices):
+        REGULAR_HOURS = 'O', _('Regular Hours')
+        LIMITED_HOURS = 'L', _('Limited Hours')
+        TEMPORARILY_CLOSED = 'C', _('Temporarily Closed')
+    status = models.CharField(max_length=1, choices=StatusOptions.choices)
 
     # online information
     website_url = models.CharField(max_length=64, blank=True, null=True)
-    limited_menu = models.BooleanField(blank=True)
+    limited_menu = models.BooleanField(blank=True, null=True)
     menu_url = models.CharField(max_length=64, blank=True, null=True)
     email_address = models.CharField(max_length=64, blank=True, null=True)
-    accepting_future_orders = models.BooleanField(blank=True)
-    selling_gift_cards = models.BooleanField(blank=True)
+    accepting_future_orders = models.BooleanField(blank=True, null=True)
+    selling_gift_cards = models.BooleanField(blank=True, null=True)
 
 
 class Location(models.Model):
     # address
     street_address = models.CharField(max_length=128, blank=True)
     city = models.CharField(max_length=32, blank=True)
-    zipcode = models.PositiveSmallIntegerField(blank=True)
+    #zipcode = models.PositiveSmallIntegerField(blank=True)
+    zipcode = models.CharField(max_length=10, blank=True)
     phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Phone number must be entered in the format: '9371234567'. Up to 15 digits allowed.")
     phone_number = models.CharField(max_length=17, validators=[phone_regex], blank=True)
     restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
 
 
 class OpeningHours(models.Model):
-    WEEKDAYS = [
-      (1, _("Monday")),
-      (2, _("Tuesday")),
-      (3, _("Wednesday")),
-      (4, _("Thursday")),
-      (5, _("Friday")),
-      (6, _("Saturday")),
-      (7, _("Sunday")),
-    ]
-    weekday = models.IntegerField(choices=WEEKDAYS)
+
+    class Weekday(models.TextChoices):
+        MONDAY = 1, _('Monday')
+        TUESDAY = 2, _('Tuesday')
+        WEDNESDAY = 3, _('Wednesday')
+        THURSDAY = 4, _('Thursday')
+        FRIDAY = 5, _('Friday')
+        SATURDAY = 6, _('Saturday')
+        SUNDAY = 7, _('Sunday')
+    weekday = models.IntegerField(choices=Weekday.choices)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
     address = models.ForeignKey('Location', on_delete=models.CASCADE)
@@ -60,49 +61,48 @@ class OpeningHours(models.Model):
 
 
 class OrderMethods(models.Model):
-    ORDER_METHODS = [
-        ('C', _('Direct Call')),
-        ('A', _('Delivery Apps')),
-        ('W', _('Website')),
-        ('O', _('Other')),
-    ]
-    order_methods = models.CharField(max_length=1, choices=ORDER_METHODS, blank=True)
+
+    class OrderMethods(models.TextChoices):
+        CALL = 'C', _('Direct Call')
+        APPS = 'A', _('Delivery Apps')
+        WEBSITE = 'W', _('Website')
+        OTHER = 'O', _('Other')
+    order_methods = models.CharField(max_length=1, choices=OrderMethods.choices, blank=True)
     restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
 
 
 class DeliveryOptions(models.Model):
-    DELIVERY_OPTIONS = [
-        ('DR', _('Direct from Restaurant')),
-        ('GH', _('GrubHub')),
-        ('PM', _('Postmates')),
-        ('DD', _('Door Dash')),
-        ('UE', _('Uber Eats')),
-        ('SL', _('Seamless')),
-        ('OT', _('Other')),
-    ]
-    None
-    delivery_options = models.CharField(max_length=2, choices=DELIVERY_OPTIONS, blank=True)
+
+    class DeliveryMethods(models.TextChoices):
+        DIRECT = 'DR', _('Direct from Restaurant')
+        GRUBHUB = 'GH', _('GrubHub')
+        POSTMATES = 'PM', _('Postmates')
+        DOOR_DASH = 'DD', _('Door Dash')
+        UBER_EATS = 'UE', _('Uber Eats')
+        SEAMLESS = 'SL', _('Seamless')
+        OTHER = 'OT', _('Other')
+    delivery_options = models.CharField(max_length=2, choices=DeliveryMethods.choices, blank=True)
     restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
 
 
 class PickupOptions(models.Model):
-    PICKUP_OPTIONS = [
-        ('CO', _('Carry Out')),
-        ('CS', _('Curbside')),
-    ]
-    pickup_options = models.CharField(max_length=2, choices=PICKUP_OPTIONS, blank=True)
+
+    class PickupOptions(models.TextChoices):
+        CARRY_OUT = 'CO', _('Carry Out')
+        CURBSIDE = 'CS', _('Curbside')
+    pickup_options = models.CharField(max_length=2, choices=PickupOptions.choices, blank=True)
     restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
 
 
 class DietaryOptions(models.Model):
-    DIET_OPTIONS = [
-        ('VT', ('Vegetarian')),
-        ('VG', ('Vegan')),
-        ('PF', ('Peanut Free')),
-        ('DF', ('Dairy Free')),
-        ('SF', ('Soy Free')),
-        ('GF', ('Gluten Free')),
-        ('OT', ('Other')),
-    ]
-    dietary_options = models.CharField(max_length=2, choices=DIET_OPTIONS, blank=True)
+
+    class DietaryOptions(models.TextChoices):
+        DIRECT = 'VT', _('Vegetarian')
+        GRUBHUB = 'VG', _('Vegan')
+        POSTMATES = 'PF', _('Peanut Free')
+        DOOR_DASH = 'DF', _('Dairy Free')
+        UBER_EATS = 'SF', _('Soy Free')
+        SEAMLESS = 'GF', _('Gluten Free')
+        OTHER = 'OT', _('Other')
+    dietary_options = models.CharField(max_length=2, choices=DietaryOptions.choices, blank=True)
     restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
