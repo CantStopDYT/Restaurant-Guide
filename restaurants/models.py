@@ -7,22 +7,23 @@ class Restaurant(models.Model):
     create = models.DateTimeField(auto_now_add=True)
     # region = models.CharField(max_length=128, blank=True)
 
+
     # status
     name = models.CharField(max_length=128)
-    STATUS_OPTIONS = [
-        ('O', _('Regular Hours')),
-        ('L', _('Limited Hours')),
-        ('C', _('Temporarily Closed')),
-    ]
-    status = models.CharField(max_length=1, choices=STATUS_OPTIONS)
+
+    class StatusOptions(models.TextChoices):
+        REGULAR_HOURS = 'O', _('Regular Hours')
+        LIMITED_HOURS = 'L', _('Limited Hours')
+        TEMPORARILY_CLOSED = 'C', _('Temporarily Closed')
+    status = models.CharField(max_length=1, choices=StatusOptions.choices)
 
     # online information
     website_url = models.CharField(max_length=64, blank=True, null=True)
-    limited_menu = models.BooleanField(blank=True)
+    limited_menu = models.BooleanField(blank=True, null=True)
     menu_url = models.CharField(max_length=64, blank=True, null=True)
     email_address = models.CharField(max_length=64, blank=True, null=True)
-    accepting_future_orders = models.BooleanField(blank=True)
-    selling_gift_cards = models.BooleanField(blank=True)
+    accepting_future_orders = models.BooleanField(blank=True, null=True)
+    selling_gift_cards = models.BooleanField(blank=True, null=True)
 
 
 class Location(models.Model):
