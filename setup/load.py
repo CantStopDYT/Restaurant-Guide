@@ -47,16 +47,22 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             if entry['How To Order'] != '':
                 options = entry['How To Order'].split(',')
                 for option in options:
-                    DeliveryOptions.objects.create(
-                        delivery_options=option,
+                    pass
+                    '''
+                    OrderMethods.objects.create(
+                        order_methods=order_methods_map[option],
                         restaurant=restaurant
                     )
+                    '''
 
             # create associated delivery options
             if entry['Delivery Options'] != '':
                 options = entry['Delivery Options'].split(',')
                 for option in options:
+                    pass
+                    '''
                     DeliveryOptions.objects.create(
-                        delivery_options=option,
+                        delivery_options=delivery_methods_map[option.strip()],
                         restaurant=restaurant
                     )
+                    '''
