@@ -3,7 +3,8 @@ import csv
 
 
 def load_airtable(file_path='setup/data/Main View.csv'):
-    status_map = {status.label: status.value for status in Restauant.StatusOptions}
+    status_map = {status.label: status.value for status in Restaurant.StatusOptions}
+    order_methods_map = {om.label: om.value for om in OrderMethods.OrderMethods}
     delivery_methods_map = {dm.label: dm.value for dm in DeliveryOptions.DeliveryMethods}
 
     with open(file_path, encoding='utf-8-sig') as csvfile:
@@ -41,6 +42,15 @@ def load_airtable(file_path='setup/data/Main View.csv'):
                 to_hour=,
             )
             """
+
+            # create associated delivery options
+            if entry['How To Order'] != '':
+                options = entry['How To Order'].split(',')
+                for option in options:
+                    DeliveryOptions.objects.create(
+                        delivery_options=option,
+                        restaurant=restaurant
+                    )
 
             # create associated delivery options
             if entry['Delivery Options'] != '':
