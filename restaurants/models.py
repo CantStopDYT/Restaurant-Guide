@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 
 
-class Restauant(models.Model):
+class Restaurant(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     #region = models.CharField(max_length=128, blank=True)
 
@@ -24,16 +24,21 @@ class Restauant(models.Model):
     accepting_future_orders = models.BooleanField(blank=True, null=True)
     selling_gift_cards = models.BooleanField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Location(models.Model):
     # address
     street_address = models.CharField(max_length=128, blank=True)
     city = models.CharField(max_length=32, blank=True)
-    #zipcode = models.PositiveSmallIntegerField(blank=True)
     zipcode = models.CharField(max_length=10, blank=True)
     phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Phone number must be entered in the format: '9371234567'. Up to 15 digits allowed.")
     phone_number = models.CharField(max_length=17, validators=[phone_regex], blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.restaurant.name
 
 
 class OpeningHours(models.Model):
@@ -68,7 +73,7 @@ class OrderMethods(models.Model):
         WEBSITE = 'W', _('Website')
         OTHER = 'O', _('Other')
     order_methods = models.CharField(max_length=1, choices=OrderMethods.choices, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class DeliveryOptions(models.Model):
@@ -82,7 +87,7 @@ class DeliveryOptions(models.Model):
         SEAMLESS = 'SL', _('Seamless')
         OTHER = 'OT', _('Other')
     delivery_options = models.CharField(max_length=2, choices=DeliveryMethods.choices, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class PickupOptions(models.Model):
@@ -91,7 +96,7 @@ class PickupOptions(models.Model):
         CARRY_OUT = 'CO', _('Carry Out')
         CURBSIDE = 'CS', _('Curbside')
     pickup_options = models.CharField(max_length=2, choices=PickupOptions.choices, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
 
 
 class DietaryOptions(models.Model):
@@ -105,4 +110,4 @@ class DietaryOptions(models.Model):
         SEAMLESS = 'GF', _('Gluten Free')
         OTHER = 'OT', _('Other')
     dietary_options = models.CharField(max_length=2, choices=DietaryOptions.choices, blank=True)
-    restaurant = models.ForeignKey('Restauant', on_delete=models.CASCADE)
+    restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE)
