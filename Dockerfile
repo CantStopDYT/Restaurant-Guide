@@ -7,7 +7,7 @@ RUN apt-get update -qq; \
         software-properties-common \
         apt-transport-https ca-certificates gnupg software-properties-common wget
 
-RUN apt-get install binutils libproj-dev gdal-bin python3-gdal -y
+RUN apt-get install binutils libproj-dev gdal-bin libpq-dev python3-gdal -y
 
 EXPOSE 8000
 
