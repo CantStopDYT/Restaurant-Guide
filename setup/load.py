@@ -48,9 +48,14 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             # create entry for each restaurant location
             re_phone_number = re.search('[(]([0-9]{3})[)]\s?([0-9]{3})-([0-9]{4})', entry['Phone Number'], re.IGNORECASE)
             phone_number = '{}{}{}'.format(re_phone_number.group(1),re_phone_number.group(2),re_phone_number.group(3))
+
+            # set default state to Ohio
+            state = 'OH'
+
             loc = Location.objects.create(
                 street_address=entry['Street Address'],
                 city=entry['City'],
+                state=state,
                 zipcode=entry['Zip'],
                 phone_number=phone_number,
                 restaurant=restaurant,
@@ -70,7 +75,6 @@ def load_airtable(file_path='setup/data/Main View.csv'):
                 end_day = end_day.upper()
                 start_idx = d.index(start_day)
                 while d[start_idx] != end_day:
-                    print('SET {} start={} end={}'.format(d[start_idx], start_time, end_time))
                     OpeningHours.objects.create(
                         weekday=OpeningHours.Weekday[d[start_idx]],
                         from_hour=start_time,
@@ -78,7 +82,6 @@ def load_airtable(file_path='setup/data/Main View.csv'):
                         location=loc
                     )
                     d.rotate(-1)
-                print('SET {} start={} end={}'.format(d[start_idx], start_time, end_time))
                 OpeningHours.objects.create(
                     weekday=OpeningHours.Weekday[d[start_idx]],
                     from_hour=start_time,
@@ -90,14 +93,12 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             # catch when a single day is provided
             re_hours = re.finditer('[^-]([A-Z][a-z]+day)[ ]?([:0-9]+[ ]?[aApP][mM])-([:0-9]+[ ]?[aApP][mM])', entry['Hours of Operation'])
             for hours in re_hours:
-                #print('\t{} from {} to {}'.format(hours.group(1),hours.group(2),hours.group(3)))
                 (day, start_hours, end_hours) = hours.groups()
 
                 start_time = parse_time(start_hours)
                 end_time = parse_time(end_hours)
 
                 day = day.upper()
-                print('SET {} start={} end={}'.format(day, start_time, end_time))
                 OpeningHours.objects.create(
                     weekday=OpeningHours.Weekday[day],
                     from_hour=start_time,
@@ -109,14 +110,12 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             # catch when no days are provided
             re_hours = re.finditer('^([:0-9]+[ ]?[aApP][mM])-([:0-9]+[ ]?[aApP][mM])', entry['Hours of Operation'], re.IGNORECASE)
             for hours in re_hours:
-                #print('\t{} to {}'.format(hours.group(1),hours.group(2)))
                 (start_hours, end_hours) = hours.groups()
 
                 start_time = parse_time(start_hours)
                 end_time = parse_time(end_hours)
 
                 for day in d:
-                    print('SET {} start={} end={}'.format(day, start_time, end_time))
                     OpeningHours.objects.create(
                         weekday=OpeningHours.Weekday[day],
                         from_hour=start_time,

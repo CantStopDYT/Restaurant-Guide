@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
+    # geodjango
+    'django.contrib.gis',
+
     # built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -82,12 +85,23 @@ WSGI_APPLICATION = 'resources_guide.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+         'NAME': os.getenv('POSTGRES_NAME', 'resources'),
+         'USER': os.getenv('POSTGRES_USER', 'resources'),
+         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'Pa55w0rD'),
+         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+         'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
+
 
 
 # Password validation
@@ -114,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
