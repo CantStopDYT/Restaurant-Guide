@@ -43,7 +43,7 @@ class Location(models.Model):
 
 class OpeningHours(models.Model):
 
-    class Weekday(models.TextChoices):
+    class Weekday(models.IntegerChoices):
         MONDAY = 1, _('Monday')
         TUESDAY = 2, _('Tuesday')
         WEDNESDAY = 3, _('Wednesday')
@@ -51,18 +51,17 @@ class OpeningHours(models.Model):
         FRIDAY = 5, _('Friday')
         SATURDAY = 6, _('Saturday')
         SUNDAY = 7, _('Sunday')
-    weekday = models.IntegerField(choices=Weekday.choices)
+    weekday = models.SmallIntegerField(choices=Weekday.choices)
     from_hour = models.TimeField()
     to_hour = models.TimeField()
     location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='hours')
 
     class Meta:
         ordering = ('weekday', 'from_hour')
-        unique_together = ('weekday', 'from_hour', 'to_hour')
+        #unique_together = ('weekday', 'from_hour', 'to_hour')
 
     def __str__(self):
-        self.get
-        return '%s: %s - %s'.format(self.get_weekday_display(), self.from_hour, self.to_hour)
+        return '{}: {}-{}'.format(self.get_weekday_display(), self.from_hour, self.to_hour)
 
 
 class OrderMethods(models.Model):

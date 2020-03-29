@@ -64,6 +64,8 @@ class OrderMethodsSerializer(serializers.ModelSerializer):
 
 
 class OpeningHoursSerializer(serializers.ModelSerializer):
+    # note: char field since serializer will handle int to string conversion
+    weekday = serializers.CharField(source='get_weekday_display')
 
     class Meta:
         model = OpeningHours
@@ -115,7 +117,13 @@ class RestaurantSerializer(serializers.ModelSerializer):
                 zipcode=location['zipcode'],
                 phone_number=location['phone_number']
             )
-            # TODO: populate hours at each location
+            for hour in hours:
+                OpeningHours.objects.create(
+                    weekday=OpeningHours.Weekday[hour['get_weekday_display'].upper()],
+                    from_hour=hour['from_hour'],
+                    to_hour=hour['to_hour'],
+                    location=loc
+                )
 
         for order_method in order_methods:
             OrderMethods.objects.create(

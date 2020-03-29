@@ -1,9 +1,27 @@
 from restaurants.models import *
 import csv
 import re
+import collections
+import datetime
+
+
+# parses time for the regular expression: [:0-9]+[ ]?[aApP][mM]
+def parse_time(time_str):
+    # if no minutes are found
+    if time_str.find(':') == -1:
+        hour, suffix = re.search('([0-9]+)[ ]?([aApP][mM])', time_str, re.IGNORECASE).groups()
+        return datetime.datetime.strptime('{}:00 {}'.format(hour, suffix), "%I:%M %p")
+    else:
+        hour, minute, suffix = re.search('([0-9]+):([0-9]+)[ ]?([aApP][mM])', time_str, re.IGNORECASE).groups()
+        return datetime.datetime.strptime('{}:{} {}'.format(hour, minute, suffix), "%I:%M %p")
 
 
 def load_airtable(file_path='setup/data/Main View.csv'):
+    # build a circular buffer to iterate through the days as some day ranges loop over the start of the week
+    d = collections.deque(maxlen=7)
+    for day in ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']:
+        d.append(day)
+
     status_map = {status.label: status.value for status in Restaurant.StatusOptions}
     order_methods_map = {om.label: om.value for om in OrderMethods.OrderMethods}
     delivery_methods_map = {dm.label: dm.value for dm in DeliveryOptions.DeliveryMethods}
@@ -30,7 +48,7 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             # create entry for each restaurant location
             re_phone_number = re.search('[(]([0-9]{3})[)]\s?([0-9]{3})-([0-9]{4})', entry['Phone Number'], re.IGNORECASE)
             phone_number = '{}{}{}'.format(re_phone_number.group(1),re_phone_number.group(2),re_phone_number.group(3))
-            Location.objects.create(
+            loc = Location.objects.create(
                 street_address=entry['Street Address'],
                 city=entry['City'],
                 zipcode=entry['Zip'],
@@ -39,13 +57,73 @@ def load_airtable(file_path='setup/data/Main View.csv'):
             )
 
             #TODO: Hours
-            """
-            OpeningHours.objects.create(
-                weekday=,
-                from_hour=,
-                to_hour=,
-            )
-            """
+            ##### START HOURS
+            # catch when ranges are provided
+            re_hours = re.finditer('([A-Za-z]{3,}day)-([A-Za-z]{3,}day)[ ]?([:0-9]+[ ]?[aApP][mM])-([:0-9]+[ ]?[aApP][mM])', entry['Hours of Operation'], re.IGNORECASE)
+            for hours in re_hours:
+                (start_day, end_day, start_hours, end_hours) = hours.groups()
+
+                start_time = parse_time(start_hours)
+                end_time = parse_time(end_hours)
+
+                start_day = start_day.upper()
+                end_day = end_day.upper()
+                start_idx = d.index(start_day)
+                while d[start_idx] != end_day:
+                    print('SET {} start={} end={}'.format(d[start_idx], start_time, end_time))
+                    OpeningHours.objects.create(
+                        weekday=OpeningHours.Weekday[d[start_idx]],
+                        from_hour=start_time,
+                        to_hour=end_time,
+                        location=loc
+                    )
+                    d.rotate(-1)
+                print('SET {} start={} end={}'.format(d[start_idx], start_time, end_time))
+                OpeningHours.objects.create(
+                    weekday=OpeningHours.Weekday[d[start_idx]],
+                    from_hour=start_time,
+                    to_hour=end_time,
+                    location=loc
+                )
+
+
+            # catch when a single day is provided
+            re_hours = re.finditer('[^-]([A-Z][a-z]+day)[ ]?([:0-9]+[ ]?[aApP][mM])-([:0-9]+[ ]?[aApP][mM])', entry['Hours of Operation'])
+            for hours in re_hours:
+                #print('\t{} from {} to {}'.format(hours.group(1),hours.group(2),hours.group(3)))
+                (day, start_hours, end_hours) = hours.groups()
+
+                start_time = parse_time(start_hours)
+                end_time = parse_time(end_hours)
+
+                day = day.upper()
+                print('SET {} start={} end={}'.format(day, start_time, end_time))
+                OpeningHours.objects.create(
+                    weekday=OpeningHours.Weekday[day],
+                    from_hour=start_time,
+                    to_hour=end_time,
+                    location=loc
+                )
+
+
+            # catch when no days are provided
+            re_hours = re.finditer('^([:0-9]+[ ]?[aApP][mM])-([:0-9]+[ ]?[aApP][mM])', entry['Hours of Operation'], re.IGNORECASE)
+            for hours in re_hours:
+                #print('\t{} to {}'.format(hours.group(1),hours.group(2)))
+                (start_hours, end_hours) = hours.groups()
+
+                start_time = parse_time(start_hours)
+                end_time = parse_time(end_hours)
+
+                for day in d:
+                    print('SET {} start={} end={}'.format(day, start_time, end_time))
+                    OpeningHours.objects.create(
+                        weekday=OpeningHours.Weekday[day],
+                        from_hour=start_time,
+                        to_hour=end_time,
+                        location=loc
+                    )
+            ##### END HOURS
 
             # create associated ordering options
             if entry['How To Order'] != '':
