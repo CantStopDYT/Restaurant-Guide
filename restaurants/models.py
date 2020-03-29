@@ -1,6 +1,8 @@
-from django.db import models
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
+import geocoder
 
 
 class Restaurant(models.Model):
@@ -32,10 +34,26 @@ class Location(models.Model):
     # address
     street_address = models.CharField(max_length=128, blank=True)
     city = models.CharField(max_length=32, blank=True)
+    state = models.CharField(max_length=4, blank=True)
     zipcode = models.CharField(max_length=10, blank=True)
     phone_regex = RegexValidator(regex=r'^\d{9,15}$', message="Phone number must be entered in the format: '9371234567'. Up to 15 digits allowed.")
     phone_number = models.CharField(max_length=17, validators=[phone_regex], blank=True)
+    coordinates = models.PointField(blank=True, null=True)
     restaurant = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='locations')
+
+    def save(self, *args, **kwargs):
+        # geocode before saving to database
+        geocode_str = '{} {} {}, {}'.format(
+            self.street_address,
+            self.city,
+            self.state,
+            self.zipcode
+        )
+        # geocode
+        g = geocoder.osm(geocode_str)
+        latitude, longitude = g.latlng if g.ok else [None, None]
+        self.coordinates = Point(longitude, latitude) if latitude is not None and longitude is not None else None
+        super(Location, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.restaurant.name
