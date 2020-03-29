@@ -1,12 +1,12 @@
 version: '3'
 services:
 
-    restaurants_api:
+    resources:
         build: .
         depends_on:
             - postgis
-        command: bash -c "./manage.py build_frontend &&
-                          ./manage.py wait_for_db 2> /dev/null &&
+        #command: bash -c "./manage.py wait_for_db 2> /dev/null &&
+        command: bash -c "
                           ./manage.py makemigrations &&
                           ./manage.py migrate &&
                           ./manage.py runserver 0.0.0.0:8000"

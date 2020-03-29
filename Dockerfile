@@ -1,4 +1,4 @@
-FROM python:buster
+FROM python:slim
 
 # GeoDjango and PostGIS interface
 RUN apt-get update -qq; \
@@ -7,9 +7,7 @@ RUN apt-get update -qq; \
         software-properties-common \
         apt-transport-https ca-certificates gnupg software-properties-common wget
 
-RUN apt-get install binutils libproj-dev gdal-bin -y
-
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+RUN apt-get install binutils libproj-dev gdal-bin python3-gdal -y
 
 EXPOSE 8000
 

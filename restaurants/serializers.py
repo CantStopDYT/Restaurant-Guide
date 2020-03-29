@@ -149,9 +149,4 @@ class RestaurantSerializer(serializers.ModelSerializer):
                 restaurant=restaurant
             )
 
-        #instance = Sensor.objects.create(coordinates=Point(x=longitude, y=latitude, srid=4326),
-        #                                 **validated_data)
-        #for data in sensor_data:
-        #    SensorData.objects.create(sensor=instance, **data)
-
         return restaurant
