@@ -25,6 +25,10 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_WHITELIST = [
+    'https://daytoneats.com/'
+]
+
 on_heroku = 'DYNO' in os.environ
 if on_heroku:
     import django_heroku
