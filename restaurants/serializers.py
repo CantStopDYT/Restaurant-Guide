@@ -77,7 +77,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ['street_address', 'city', 'zipcode', 'phone_number', 'hours']
+        fields = ['street_address', 'city', 'state', 'zipcode', 'phone_number', 'hours']
 
 
 class RestaurantSerializer(serializers.ModelSerializer):
@@ -114,6 +114,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
                 restaurant=restaurant,
                 street_address=location['street_address'],
                 city=location['city'],
+                state=location['state'],
                 zipcode=location['zipcode'],
                 phone_number=location['phone_number']
             )
