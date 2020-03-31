@@ -12,18 +12,15 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'sd#gg3p76^0qj-6%j8!htdr)j3q8$u3iq!!l6oj7t%dd5!fj)3'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -82,28 +79,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'resources_guide.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
-DATABASES = {
-    'default': {
-         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-         'NAME': os.getenv('POSTGRES_NAME', 'resources'),
-         'USER': os.getenv('POSTGRES_USER', 'resources'),
-         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'Pa55w0rD'),
-         'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-         'PORT': os.getenv('POSTGRES_PORT', '5432'),
-    }
-}
-
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -141,6 +116,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -5,3 +5,5 @@ djangorestframework-csv==2.1.0
 geocoder==1.38.1
 Markdown==3.2.1
 psycopg2-binary==2.8.4
+django-heroku
+gunicorn
