@@ -25,9 +25,10 @@ DATABASES = {
     }
 }
 
-CORS_ORIGIN_WHITELIST = [
-    'https://daytoneats.com/'
-]
+CORS_ORIGIN_ALLOW_ALL = True
+#CORS_ORIGIN_WHITELIST = [
+#    'https://daytoneats.com/'
+#]
 
 on_heroku = 'DYNO' in os.environ
 if on_heroku:
