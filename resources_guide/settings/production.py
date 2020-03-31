@@ -7,6 +7,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SECURE_SSL_REDIRECT = True
+
 ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
