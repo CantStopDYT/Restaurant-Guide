@@ -25,6 +25,9 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
 on_heroku = 'DYNO' in os.environ
 if on_heroku:
     import django_heroku
