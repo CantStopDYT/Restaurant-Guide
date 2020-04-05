@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from restaurants.models import *
 
@@ -151,3 +152,26 @@ class RestaurantSerializer(serializers.ModelSerializer):
             )
 
         return restaurant
+
+
+class RestaurantGeoSerializer(serializers.ModelSerializer):
+    order_methods = OrderMethodsSerializer(many=True)
+    delivery_options = DeliveryOptionsSerializer(many=True)
+    pickup_options = PickupOptionsSerializer(many=True)
+    dietary_options = DietaryOptionsSerializer(many=True)
+    status = serializers.CharField(source='get_status_display')
+
+    class Meta:
+        model = Restaurant
+        fields = ['name', 'status', 'website_url', 'menu_url',
+                  'order_methods', 'delivery_options',
+                  'pickup_options', 'dietary_options']
+
+
+class LocationGeoSerializer(GeoFeatureModelSerializer):
+    restaurant = RestaurantGeoSerializer()
+
+    class Meta:
+        model = Location
+        geo_field = 'coordinates'
+        fields = ('restaurant',)

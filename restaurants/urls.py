@@ -5,9 +5,9 @@ from restaurants import views
 
 router = routers.DefaultRouter()
 router.register(r'restaurants', views.RestaurantViewSet)
+router.register(r'locations', views.LocationList)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('geo_restaurants.geojson', views.restaurants_geojson),
 ]
