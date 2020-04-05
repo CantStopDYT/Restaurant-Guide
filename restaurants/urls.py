@@ -5,7 +5,7 @@ from restaurants import views
 
 router = routers.DefaultRouter()
 router.register(r'restaurants', views.RestaurantViewSet)
-router.register(r'locations', views.LocationList)
+router.register(r'locations', views.LocationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

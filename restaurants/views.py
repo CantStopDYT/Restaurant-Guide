@@ -6,7 +6,7 @@ from restaurants.models import Restaurant, Location
 from restaurants.serializers import RestaurantSerializer, LocationGeoSerializer
 
 
-class LocationList(viewsets.ReadOnlyModelViewSet):
+class LocationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationGeoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
