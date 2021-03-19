@@ -1,7 +1,7 @@
 Django==3.0.4
 django-cors-headers==3.2.1
 django-filter==2.2.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 djangorestframework-csv==2.1.0
 djangorestframework-gis==0.15
 geocoder==1.38.1
